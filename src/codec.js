@@ -214,6 +214,7 @@ async function writencoded(path, data) {
 async function readencoded(path){
    const response = await fetch(path);
    const text = await response.text();
+   if(!text)return ''
    return new Decoder().decode(text);
 }
 
