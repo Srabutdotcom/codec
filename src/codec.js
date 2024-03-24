@@ -206,16 +206,32 @@ function bytesToBase64(str) {
 const a = bytesToBase64("a Ā 𐀀 文 🦄")// 'YSDEgCDwkICAIOaWhyDwn6aE'
 const b = base64ToBytes(a) // "a Ā 𐀀 文 🦄"
 
+/**
+ * 
+ * @param {URL|string} path 
+ * @param {any} data 
+ * @returns 
+ */
 async function writencoded(path, data) {
    const encoded = await new Encoder().encode(data);
-   Deno.writeTextFileSync(path, encoded);
+   try {
+      Deno.writeTextFileSync(path, encoded);
+   } catch (error) {
+      return new Error(error)
+   } finally {
+      return true;
+   }
 }
-
-async function readencoded(path){
+/**
+ * 
+ * @param {URL|string} path 
+ * @returns 
+ */
+async function readencoded(path) {
    const response = await fetch(path);
    const text = await response.text();
-   if(!text)return ''
+   if (!text) return ''
    return new Decoder().decode(text);
 }
 
-export { Encoder, Decoder, base64urlEncode, base64urlDecode, base64ToBytes, bytesToBase64, writencoded, readencoded}
+export { Encoder, Decoder, base64urlEncode, base64urlDecode, base64ToBytes, bytesToBase64, writencoded, readencoded }
