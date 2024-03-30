@@ -2,11 +2,10 @@ const encoder = new TextEncoder
 const decoder = new TextDecoder
 
 class Encoder {
-   #btoaf = btoa
-   constructor(options = {data:null, advance : false}) {
-      const { data, advance } = options;
+   #btoaf = bytesToBase64
+   constructor(options = {data:null}) {
+      const { data } = options;
       this.raw = data;
-      if (advance) this.#btoaf = bytesToBase64
    }
    async encode(data = this.raw) {
       if (!arguments.length && !this.raw) throw new Error('data is undefined');
@@ -102,11 +101,10 @@ class Encoder {
 }
 
 class Decoder {
-   #atobf = atob
-   constructor(options = {data:null, advance : false}) {
-      const { data, advance } = options;
+   #atobf = base64ToBytes
+   constructor(options = {data:null}) {
+      const { data } = options;
       this.raw = data;
-      if (advance) this.#atobf = base64ToBytes
    }
    decode(data = this.raw) {
       if (!arguments.length && !this.raw) throw new Error('data is undefined');
@@ -199,12 +197,15 @@ function base64urlDecode(input) {
 //https://developer.mozilla.org/en-US/docs/Glossary/Base64#the_unicode_problem
 function base64ToBytes(base64) {
    const binString = atob(base64);
-   const uin8arr = Uint8Array.from(binString, (m) => m.codePointAt(0));
+   if(!binString.match(/^expanded/)){return binString;}// `expanded` as identifier
+   const uin8arr = Uint8Array.from(binString.substring(8), (m) => m.codePointAt(0));
    return new TextDecoder().decode(uin8arr)
 }
 
 function bytesToBase64(str) {
-   const bytes = new TextEncoder().encode(str);
+   const tmp = tryBtoa(str);
+   if(typeof tmp =='string') return tmp;
+   const bytes = new TextEncoder().encode('expanded'+str);
    // to avoid max call stack where the arguments length max is 65535
    const CHUNK_SIZE = 10000; // Adjust the chunk size as needed
    let binString = ''
@@ -215,6 +216,16 @@ function bytesToBase64(str) {
    }
 
    return btoa(binString);
+}
+
+function tryBtoa(str){
+   let out = ''
+   try {
+      out = btoa(str)
+   } catch (error) {
+      return false
+   }
+   return out;
 }
 
 /* const a = bytesToBase64("a Ā 𐀀 文 🦄")// 'YSDEgCDwkICAIOaWhyDwn6aE'

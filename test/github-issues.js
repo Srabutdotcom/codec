@@ -2324,7 +2324,12 @@ export const js = [
   }
 ]
 
-
+const start = performance.now();
 const encoded = await new Encoder({advance: true}).encode(js);
+const timeLapse = performance.now()-start;
+
+const start2 = performance.now();
 const decoded = await new Decoder({advance: true}).decode(encoded);
-debugger; 
+const timeLapse2 = performance.now()-start2;
+
+debugger;
