@@ -235,3 +235,5 @@ async function readencoded(path) {
 }
 
 export { Encoder, Decoder, base64urlEncode, base64urlDecode, base64ToBytes, bytesToBase64, writencoded, readencoded }
+
+//`esbuild ./src/codec.js --bundle --minify --format=esm --target=es2022 --outdir=dist`
