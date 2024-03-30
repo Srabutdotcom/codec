@@ -3,9 +3,10 @@ const decoder = new TextDecoder
 
 class Encoder {
    #btoaf = btoa
-   constructor(data, advance=false) {
-      if (arguments.length) this.raw = data;
-      if(advance)this.#btoaf = bytesToBase64
+   constructor(options = {data:null, advance : false}) {
+      const { data, advance } = options;
+      this.raw = data;
+      if (advance) this.#btoaf = bytesToBase64
    }
    async encode(data = this.raw) {
       if (!arguments.length && !this.raw) throw new Error('data is undefined');
@@ -102,9 +103,10 @@ class Encoder {
 
 class Decoder {
    #atobf = atob
-   constructor(data, advance = false) {
-      if (arguments.length) this.raw = data;
-      if (advance)this.#atobf = base64ToBytes
+   constructor(options = {data:null, advance : false}) {
+      const { data, advance } = options;
+      this.raw = data;
+      if (advance) this.#atobf = base64ToBytes
    }
    decode(data = this.raw) {
       if (!arguments.length && !this.raw) throw new Error('data is undefined');
@@ -203,12 +205,20 @@ function base64ToBytes(base64) {
 
 function bytesToBase64(str) {
    const bytes = new TextEncoder().encode(str);
-   const binString = String.fromCodePoint(...bytes);
+   // to avoid max call stack where the arguments length max is 65535
+   const CHUNK_SIZE = 10000; // Adjust the chunk size as needed
+   let binString = ''
+
+   for (let i = 0; i < bytes.length; i += CHUNK_SIZE) {
+      const chunk = bytes.slice(i, i + CHUNK_SIZE);
+      binString += String.fromCodePoint(...chunk);
+   }
+
    return btoa(binString);
 }
 
-const a = bytesToBase64("a Ā 𐀀 文 🦄")// 'YSDEgCDwkICAIOaWhyDwn6aE'
-const b = base64ToBytes(a) // "a Ā 𐀀 文 🦄"
+/* const a = bytesToBase64("a Ā 𐀀 文 🦄")// 'YSDEgCDwkICAIOaWhyDwn6aE'
+const b = base64ToBytes(a) // "a Ā 𐀀 文 🦄" */
 
 /**
  * 
