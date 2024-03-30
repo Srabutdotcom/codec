@@ -2,23 +2,25 @@ const encoder = new TextEncoder
 const decoder = new TextDecoder
 
 class Encoder {
-   constructor(data) {
+   #btoaf = btoa
+   constructor(data, advance=false) {
       if (arguments.length) this.raw = data;
+      if(advance)this.#btoaf = bytesToBase64
    }
    async encode(data = this.raw) {
       if (!arguments.length && !this.raw) throw new Error('data is undefined');
       const type = data === null ? 'null' : typeof data;
       switch (type) {
-         case 'undefined': return btoa(JSON.stringify([type, 'undefined']))
+         case 'undefined': return this.#btoaf(JSON.stringify([type, 'undefined']))
          case 'number': return this.encodeNumber(type, data)
          case 'null':
          case 'boolean':
-         case 'string': return btoa(JSON.stringify([type, data]))
-         case 'bigint': return btoa(JSON.stringify([type, data.toString()]));
-         case 'symbol': return btoa(JSON.stringify([type, data.description]));
-         case 'function': return btoa(JSON.stringify([type, data.toString()]));
+         case 'string': return this.#btoaf(JSON.stringify([type, data]))
+         case 'bigint': return this.#btoaf(JSON.stringify([type, data.toString()]));
+         case 'symbol': return this.#btoaf(JSON.stringify([type, data.description]));
+         case 'function': return this.#btoaf(JSON.stringify([type, data.toString()]));
          case 'object': return await this.encodeObjectVariant(data)
-         default: return btoa(JSON.stringify([type, data]))
+         default: return this.#btoaf(JSON.stringify([type, data]))
       }
    }
    encodeNumber(type, data) {
@@ -29,22 +31,22 @@ class Encoder {
          case Infinity: { _data = "Infinity"; break }
          default: _data = data; break;
       }
-      return btoa(JSON.stringify([type, _data]))
+      return this.#btoaf(JSON.stringify([type, _data]))
    }
    async encodeObjectVariant(data) {
       if (!arguments.length) throw new Error('data is undefined')
       const instance = (data)?.constructor ?? Object
       switch (instance) {
-         case RegExp: return btoa(JSON.stringify([instance.name, { source: data.source, flags: data.flags }]))
-         case Error: return btoa(JSON.stringify([instance.name, { message: data.message, cause: data.cause }]))
+         case RegExp: return this.#btoaf(JSON.stringify([instance.name, { source: data.source, flags: data.flags }]))
+         case Error: return this.#btoaf(JSON.stringify([instance.name, { message: data.message, cause: data.cause }]))
          case Blob: {
             const text = await data.text();
-            return btoa(JSON.stringify([instance.name, text]))
+            return this.#btoaf(JSON.stringify([instance.name, text]))
          }
          case ArrayBuffer:
          case DataView: {
             const text = decoder.decode(data)
-            return btoa(JSON.stringify([instance.name, text]))
+            return this.#btoaf(JSON.stringify([instance.name, text]))
          }
          case Int8Array:
          case Uint8Array:
@@ -56,17 +58,17 @@ class Encoder {
          case Float32Array:
          case Float64Array: {
             //const text = decoder.decode(new Uint8Array([...data]));
-            return btoa(JSON.stringify([instance.name, data.toString()]))
+            return this.#btoaf(JSON.stringify([instance.name, data.toString()]))
          }
          case BigInt64Array:
          case BigUint64Array: {
             //const text = decoder.decode(new Uint8Array([...data].map(e => e.toString())));
-            return btoa(JSON.stringify([instance.name, data.toString()]))
+            return this.#btoaf(JSON.stringify([instance.name, data.toString()]))
          }
          case String:
          case Number:
          case Boolean:
-         case Date: return btoa(JSON.stringify([instance.name, data.valueOf()]))
+         case Date: return this.#btoaf(JSON.stringify([instance.name, data.valueOf()]))
          case Array: return await this.encodeArray(data);
          case Object: return await this.encodeObject(data);
          case Map: return await this.encodeMap(data)
@@ -79,32 +81,34 @@ class Encoder {
       for (const e of data) {
          array.push(await this.encode(e));
       }
-      return btoa(JSON.stringify(["Array", array]))
+      return this.#btoaf(JSON.stringify(["Array", array]))
    }
    async encodeObject(data) {
       const object = {}
       for (const e in data) {
          object[e] = await this.encode(data[e])
       }
-      return btoa(JSON.stringify(["Object", object]))
+      return this.#btoaf(JSON.stringify(["Object", object]))
    }
    async encodeMap(data) {
       const array = await this.encode([...data.entries()]);
-      return btoa(JSON.stringify(["Map", array]))
+      return this.#btoaf(JSON.stringify(["Map", array]))
    }
    async encodeSet(data) {
       const array = await this.encode([...data.values()]);
-      return btoa(JSON.stringify(["Set", array]))
+      return this.#btoaf(JSON.stringify(["Set", array]))
    }
 }
 
 class Decoder {
-   constructor(data) {
+   #atobf = atob
+   constructor(data, advance = false) {
       if (arguments.length) this.raw = data;
+      if (advance)this.#atobf = base64ToBytes
    }
    decode(data = this.raw) {
       if (!arguments.length && !this.raw) throw new Error('data is undefined');
-      const [type, src] = JSON.parse(atob(data));
+      const [type, src] = JSON.parse(this.#atobf(data));
       switch (type) {
          case 'string': return src
          case 'null': return null
