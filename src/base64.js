@@ -9,7 +9,7 @@ class Encoder {
       const { data } = options;
       this.raw = data;
    }
-   async encode(data = this.raw) {
+   encode(data = this.raw) {
       if (!arguments.length && !this.raw) throw new Error('data is undefined');
       const type = arguments[0] === null ? 'null' : typeof arguments[0];//NOTE - to avoid missinterprete of undefined to null using parameter data
       switch (type) {
@@ -21,14 +21,14 @@ class Encoder {
          case 'bigint': return this.encoder(231, data.toString());
          case 'symbol': return this.encoder(232, data.description);
          case 'function': return this.encoder(233, data.toString());
-         case 'object': return await this.encodeObjectVariant(data)
+         case 'object': return this.encodeObjectVariant(data)
       }
    }
    encodeNumber(type, data) {
       if(Object.is(-0,data)) return this.encoder(50,)
       return this.encoder(type, Number(data).toString())
    }
-   async encodeObjectVariant(data) {
+   encodeObjectVariant(data) {
       if (!arguments.length) throw new Error('data is undefined')
       const instance = (data)?.constructor ?? Object
       switch (instance) {
@@ -58,35 +58,35 @@ class Encoder {
          case Number: return this.encodeNumber(235, data)
          case Boolean: return this.encoder(236, data)
          case Date: return this.encoder(237, data.valueOf())
-         case Array: return await this.encodeArray(data);
-         case Object: return await this.encodeObject(data);
-         case Map: return await this.encodeMap(data)
-         case Set: return await this.encodeSet(data)
-         default: return await this.encodeObject(data);
+         case Array: return this.encodeArray(data);
+         case Object: return this.encodeObject(data);
+         case Map: return this.encodeMap(data)
+         case Set: return this.encodeSet(data)
+         default: return this.encodeObject(data);
       }//end of Switch
    }
-   async encodeArray(data) {
+   encodeArray(data) {
       const array = []
       let i = 0;
       for (const e of data) {
          if((i in data)==false){ array.push(this.encoder(228,)); i++;continue}
-         array.push(await this.encode(e));i++;
+         array.push(this.encode(e));i++;
       }
       return this.encoder(162, array)
    }
-   async encodeObject(data) {
+   encodeObject(data) {
       const object = {}
       for (const e in data) {
-         object[e] = await this.encode(data[e])
+         object[e] = this.encode(data[e])
       }
       return this.encoder(194, object)
    }
-   async encodeMap(data) {
-      const array = await this.encode([...data.entries()]);
+   encodeMap(data) {
+      const array = this.encode([...data.entries()]);
       return this.encoder(242, array)
    }
-   async encodeSet(data) {
-      const array = await this.encode([...data.values()]);
+   encodeSet(data) {
+      const array = this.encode([...data.values()]);
       return this.encoder(241, array)
    }
 }
@@ -237,8 +237,8 @@ const b = base64ToBytes(a) // "a Ā 𐀀 文 🦄" */
  * @param {any} data 
  * @returns 
  */
-async function writencoded(path, data) {
-   const encoded = await new Encoder().encode(data);
+function writencoded(path, data) {
+   const encoded = new Encoder().encode(data);
    try {
       Deno.writeTextFileSync(path, encoded);
    } catch (error) {
@@ -252,9 +252,9 @@ async function writencoded(path, data) {
  * @param {URL|string} path 
  * @returns 
  */
-async function readencoded(path) {
-   const response = await fetch(path);
-   const text = await response.text();
+function readencoded(path) {
+   const response = fetch(path);
+   const text = response.text();
    if (!text) return ''
    return new Decoder().decode(text);
 }
