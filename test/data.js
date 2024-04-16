@@ -2,8 +2,10 @@
 export const primitives = [
    null,
    undefined,
+   , // empty slot
    true,
    false,
+   -0,
    0,
    1.00,
    NaN,
@@ -29,13 +31,16 @@ const uint8Array = new Uint8Array(arrayBuffer);
 
 // samples of object variant
 export const objects = [
+   {},
+   [],
+   [1,,4],
    new Number(1.25),
    new String('strObject'),
    new Boolean(true),
    new Date(),
    /['"=]/gs,
    new Error("New Error", {cause:'i don\'t know'}),
-   helloBlob,
+   //helloBlob,
    new DataView(arrayBuffer),
    arrayBuffer,
    new Int8Array(arrayBuffer),
@@ -59,6 +64,7 @@ export const objects = [
       ['city', 'New York']
    ]),
    new Set([1, 2, 2, "apple", "orange", "apple"]),
+   new URL("https://google.com")
 ]
 
 // samples of function variant
@@ -106,3 +112,5 @@ export const functions = [
       }
    }
 ]
+
+export const specialString = "Hello, 你好, Привет!"
