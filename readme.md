@@ -1,6 +1,4 @@
-I'd be glad to create a README.md for your base64 encoding/decoding tool named `base64`:
-
-**## base64 and binary**
+## **base64 and binary**
 
 This JavaScript library provides efficient and versatile functions for encoding and decoding data to/from Base64 or binary format. It supports a wide range of data types, making it a valuable tool for various web development scenarios.
 
@@ -64,6 +62,7 @@ We welcome contributions to this project! Feel free to fork the repository, make
 
 **Additional Notes:**
 
+- Using binary is more efficient but the preference is up to user.
 - For security-sensitive applications, be mindful of potential vulnerabilities when using Base64 encoding/decoding. Consider additional security measures if necessary.
 
 I hope this README.md provides a comprehensive overview of your `base64` library!
