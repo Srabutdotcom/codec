@@ -18,8 +18,8 @@ The library exports two main functions:
 **Examples:**
 
 ```javascript
-import { base64 } from 'base64.js';
-import { binary } from 'binary.js';
+import { base64, binary } from 'https://deno.land/x/codec/mod.js';
+// or from 'https://deno.land/x/codec/src/datapack.js'
 
 // create Encoder and Decoder
 const encoder = new base64.Encoder

@@ -2,11 +2,13 @@
 /dist/codec.js
 /dist/codecArray.js
 /dist/msgpack.js
+/dist/datapack.js
 /src/codecbyte_v.1
 /src/codecbyte_v.2/dist
 /src/codecbyte_v.2/decoder.js
 /src/codecbyte_v.2/encoder.js
 /src/codecArray.js
+/src/datapack.js
 /test/testcodecarray.js
 /test/functions.enc
 /test/github-issues.js
