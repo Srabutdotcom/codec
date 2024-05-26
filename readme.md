@@ -66,3 +66,10 @@ We welcome contributions to this project! Feel free to fork the repository, make
 - For security-sensitive applications, be mindful of potential vulnerabilities when using Base64 encoding/decoding. Consider additional security measures if necessary.
 
 I hope this README.md provides a comprehensive overview of your `base64` library!
+
+### Sponsorship
+
+I need Sponsorship to maintain and create other codes.
+Just click one of the following links
+- https://github.com/sponsors/Srabutdotcom
+- https://paypal.me/aiconeid
